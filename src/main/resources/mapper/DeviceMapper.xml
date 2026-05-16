@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.iotdemo.mapper.DeviceMapper">
+
+    <insert id="insert" parameterType="com.example.iotdemo.entity.Device"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO device (
+        device_id,
+        device_name,
+        product_key,
+        device_type,
+        status
+        ) VALUES (
+        #{deviceId},
+        #{deviceName},
+        #{productKey},
+        #{deviceType},
+        #{status}
+        )
+    </insert>
+
+    <select id="findByDeviceId" resultType="com.example.iotdemo.entity.Device">
+        SELECT *
+        FROM device
+        WHERE device_id = #{deviceId}
+    </select>
+
+    <select id="findById" resultType="com.example.iotdemo.entity.Device">
+        SELECT *
+        FROM device
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.example.iotdemo.entity.Device">
+        SELECT *
+        FROM device
+        ORDER BY id DESC
+    </select>
+
+</mapper>
