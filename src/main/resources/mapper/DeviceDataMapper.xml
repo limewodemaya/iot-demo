@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.iotdemo.mapper.DeviceDataMapper">
+
+    <insert id="insert"
+            parameterType="com.example.iotdemo.entity.DeviceData"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO device_data (
+        device_id,
+        report_time,
+        temperature,
+        voltage,
+        current_value,
+        power,
+        soc
+        ) VALUES (
+        #{deviceId},
+        #{reportTime},
+        #{temperature},
+        #{voltage},
+        #{currentValue},
+        #{power},
+        #{soc}
+        )
+    </insert>
+
+    <select id="findHistory" resultType="com.example.iotdemo.entity.DeviceData">
+        SELECT
+        id,
+        device_id,
+        report_time,
+        temperature,
+        voltage,
+        current_value,
+        power,
+        soc,
+        created_at
+        FROM device_data
+        WHERE device_id = #{deviceId}
+        AND report_time &gt;= #{startTime}
+        AND report_time &lt;= #{endTime}
+        ORDER BY report_time ASC
+    </select>
+
+</mapper>

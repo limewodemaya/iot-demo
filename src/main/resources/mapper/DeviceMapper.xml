@@ -22,6 +22,14 @@
         )
     </insert>
 
+    <update id="updateReportInfo">
+        UPDATE device
+        SET status = 'ONLINE',
+        last_report_time = #{reportTime},
+        updated_at = NOW()
+        WHERE device_id = #{deviceId}
+    </update>
+
     <select id="findByDeviceId" resultType="com.example.iotdemo.entity.Device">
         SELECT *
         FROM device
