@@ -22,7 +22,7 @@
         )
     </insert>
 
-    <update id="updateReportInfo">
+    <update id="updateReportInfo" parameterType="com.example.iotdemo.param.DeviceReportUpdateParam">
         UPDATE device
         SET status = 'ONLINE',
         last_report_time = #{reportTime},

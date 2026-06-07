@@ -1,22 +1,21 @@
 package com.example.iotdemo.service;
 
-import com.example.iotdemo.dto.DeviceDataMockRequest;
+import com.example.iotdemo.dto.DeviceDataReportRequest;
 import com.example.iotdemo.entity.Device;
 import com.example.iotdemo.entity.DeviceData;
 import com.example.iotdemo.exception.BusinessException;
 import com.example.iotdemo.mapper.DeviceDataMapper;
 import com.example.iotdemo.mapper.DeviceMapper;
+import com.example.iotdemo.param.DeviceDataHistoryQueryParam;
+import com.example.iotdemo.param.DeviceReportUpdateParam;
 import com.example.iotdemo.vo.DeviceDataVO;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
-
-import com.example.iotdemo.vo.DeviceVO;
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotBlank;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,29 +27,19 @@ public class DeviceDataService {
 
     @Resource
     private DeviceDataMapper deviceDataMapper;
+
     @Resource
     private DeviceMapper deviceMapper;
 
-//    public DeviceDataVO mock(DeviceDataMockRequest request) {
-//        DeviceDataVO deviceData = new DeviceDataVO();
-//        deviceData.setId(idGenerator.getAndIncrement());
-//        deviceData.setDeviceId(request.getDeviceId());
-//        deviceData.setTemperature(request.getTemperature());
-//
-//
-//        deviceDataList.add(deviceData);
-//        return deviceData;
-//    }
-
     @Transactional
-    public DeviceDataVO mockReport(DeviceDataMockRequest request) {
+    public DeviceDataVO report(DeviceDataReportRequest request) {
         Device device = deviceMapper.findByDeviceId(request.getDeviceId());
         if (device == null) {
-            throw new BusinessException("设备不存在，deviceId=" + request.getDeviceId());
+            throw new BusinessException("device not found, deviceId=" + request.getDeviceId());
         }
 
         if (request.getReportTime().isAfter(LocalDateTime.now().plusMinutes(5))) {
-            throw new BusinessException("上报时间不能超过当前时间5分钟");
+            throw new BusinessException("reportTime cannot be more than 5 minutes ahead");
         }
 
         DeviceData deviceData = new DeviceData();
@@ -63,11 +52,10 @@ public class DeviceDataService {
         deviceData.setSoc(request.getSoc());
 
         deviceDataMapper.insert(deviceData);
-
-        deviceMapper.updateReportInfo(
+        deviceMapper.updateReportInfo(new DeviceReportUpdateParam(
                 request.getDeviceId(),
                 request.getReportTime()
-        );
+        ));
 
         return toVO(deviceData);
     }
@@ -78,21 +66,29 @@ public class DeviceDataService {
                 .toList();
     }
 
-    public List<DeviceDataVO> history(@NotBlank(message = "deviceId不能为空") String deviceId, LocalDateTime startTime, LocalDateTime endTime) {
+    public List<DeviceDataVO> history(
+            @NotBlank(message = "deviceId must not be blank") String deviceId,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
         Device device = deviceMapper.findByDeviceId(deviceId);
         if (device == null) {
-            throw new BusinessException("设备不存在，deviceId=" + deviceId);
+            throw new BusinessException("device not found, deviceId=" + deviceId);
         }
 
         if (startTime == null || endTime == null) {
-            throw new BusinessException("开始时间和结束时间不能为空");
+            throw new BusinessException("startTime and endTime must not be null");
         }
 
         if (startTime.isAfter(endTime)) {
-            throw new BusinessException("开始时间不能晚于结束时间");
+            throw new BusinessException("startTime cannot be after endTime");
         }
 
-        List<DeviceData> list = deviceDataMapper.findHistory(deviceId, startTime, endTime);
+        List<DeviceData> list = deviceDataMapper.findHistory(new DeviceDataHistoryQueryParam(
+                deviceId,
+                startTime,
+                endTime
+        ));
 
         return list.stream()
                 .map(this::toVO)
@@ -103,11 +99,13 @@ public class DeviceDataService {
         DeviceDataVO vo = new DeviceDataVO();
         vo.setId(deviceData.getId());
         vo.setDeviceId(deviceData.getDeviceId());
+        vo.setReportTime(deviceData.getReportTime());
+        vo.setTemperature(deviceData.getTemperature());
+        vo.setVoltage(deviceData.getVoltage());
+        vo.setCurrentValue(deviceData.getCurrentValue());
         vo.setPower(deviceData.getPower());
         vo.setSoc(deviceData.getSoc());
-        vo.setCurrentValue(deviceData.getCurrentValue());
         vo.setCreatedAt(deviceData.getCreatedAt());
-        vo.setVoltage(deviceData.getVoltage());
         return vo;
     }
 }

@@ -49,14 +49,15 @@ public class DeviceService {
     private DeviceVO toVO(Device device) {
         DeviceVO vo = new DeviceVO();
         vo.setId(device.getId());
+        vo.setDeviceId(device.getDeviceId());
         vo.setDeviceName(device.getDeviceName());
-        vo.setDeviceCode(device.getProductKey());
+        vo.setProductKey(device.getProductKey());
         vo.setDeviceType(device.getDeviceType());
         vo.setLocation(null);
         vo.setStatus(device.getStatus());
+        vo.setLastReportTime(device.getLastReportTime());
         vo.setCreatedAt(device.getCreatedAt());
         vo.setUpdatedAt(device.getUpdatedAt());
         return vo;
     }
-
 }

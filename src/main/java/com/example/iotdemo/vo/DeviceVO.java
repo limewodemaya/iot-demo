@@ -7,11 +7,13 @@ import lombok.Data;
 public class DeviceVO {
 
     private Long id;
+    private String deviceId;
     private String deviceName;
-    private String deviceCode;
+    private String productKey;
     private String deviceType;
     private String location;
     private String status;
+    private LocalDateTime lastReportTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -28,7 +28,9 @@
         )
     </insert>
 
-    <select id="findHistory" resultType="com.example.iotdemo.entity.DeviceData">
+    <select id="findHistory"
+            parameterType="com.example.iotdemo.param.DeviceDataHistoryQueryParam"
+            resultType="com.example.iotdemo.entity.DeviceData">
         SELECT
         id,
         device_id,
